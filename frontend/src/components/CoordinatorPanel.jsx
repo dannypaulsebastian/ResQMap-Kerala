@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import {
   AlertCircle, CheckCircle, ShieldAlert, Phone, Calendar,
-  Search, Filter, Zap, Trash2, Navigation
+  Search, Filter, Zap, Trash2, Navigation, ChevronDown,
+  Image as ImageIcon, Video, Mic, MessageSquare, Globe, AlertOctagon
 } from 'lucide-react';
 
 export default function CoordinatorPanel({
@@ -19,6 +20,7 @@ export default function CoordinatorPanel({
   const [filterPriority, setFilterPriority] = useState('all');
   const [filterStatus, setFilterStatus] = useState('pending');
   const [searchQuery, setSearchQuery] = useState('');
+  const [manualZoneChoice, setManualZoneChoice] = useState({});
 
   const filteredIncidents = incidents.filter((inc) => {
     const matchCategory = filterCategory === 'all' || inc.category === filterCategory;
@@ -36,6 +38,7 @@ export default function CoordinatorPanel({
   const totalPending = incidents.filter((i) => i.status === 'pending').length;
   const totalAssigned = incidents.filter((i) => i.status === 'assigned').length;
   const totalResolved = incidents.filter((i) => i.status === 'resolved').length;
+  const totalNeedsReview = incidents.filter((i) => i.status === 'needs_review').length;
 
   const getPriorityBadgeClass = (label) => {
     switch ((label || '').toUpperCase()) {
@@ -49,6 +52,19 @@ export default function CoordinatorPanel({
   const getCategoryIcon = (cat) => {
     const icons = { medical: '✙', rescue: '⚓', food_water: '🍚', shelter: '⛺' };
     return icons[cat] || '⚙';
+  };
+
+  const getSourceBadge = (source) => {
+    switch ((source || 'WEB').toUpperCase()) {
+      case 'SMS':
+        return { icon: <MessageSquare size={11} />, label: 'SMS', className: 'source-sms' };
+      case 'MMS':
+        return { icon: <ImageIcon size={11} />, label: 'MMS', className: 'source-mms' };
+      case 'VOICE':
+        return { icon: <Mic size={11} />, label: 'Voice Call', className: 'source-voice' };
+      default:
+        return { icon: <Globe size={11} />, label: 'Web', className: 'source-web' };
+    }
   };
 
   const formatTime = (isoString) => {
@@ -72,6 +88,16 @@ export default function CoordinatorPanel({
     }
   };
 
+  const handleManualAssign = (e, incident) => {
+    e.stopPropagation();
+    const chosenZoneId = manualZoneChoice[incident.id];
+    if (!chosenZoneId) return;
+    const zone = shelters.find((s) => String(s.id) === String(chosenZoneId));
+    if (zone && onAssignToZone) {
+      onAssignToZone(incident.id, zone);
+    }
+  };
+
   return (
     <div className="coordinator-panel card glass">
       <div className="card-header">
@@ -91,6 +117,12 @@ export default function CoordinatorPanel({
             <span className="stat-number">{totalResolved}</span>
             <span className="stat-label">Resolved</span>
           </div>
+          {totalNeedsReview > 0 && (
+            <div className="stat-card needs-review" onClick={() => setFilterStatus('needs_review')}>
+              <span className="stat-number">{totalNeedsReview}</span>
+              <span className="stat-label">Needs Review</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -133,6 +165,7 @@ export default function CoordinatorPanel({
             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
+              <option value="needs_review">Needs Review</option>
               <option value="assigned">Assigned</option>
               <option value="resolved">Resolved</option>
             </select>
@@ -154,11 +187,15 @@ export default function CoordinatorPanel({
               : null;
             const assignedZoneName = incident.assignedZoneName
               || (incident.assignedZoneId ? shelters.find((s) => s.id === incident.assignedZoneId)?.name : null);
+            const sourceBadge = getSourceBadge(incident.reportSource);
+            const hasPhotos = incident.photoUrls && incident.photoUrls.length > 0;
+            const hasVideos = incident.videoUrls && incident.videoUrls.length > 0;
+            const hasVoice = !!incident.voiceRecordingUrl;
 
             return (
               <div
                 key={incident.id}
-                className={`incident-list-card ${isSelected ? 'selected' : ''} priority-${incident.priorityLabel.toLowerCase()} status-${incident.status}`}
+                className={`incident-list-card ${isSelected ? 'selected' : ''} priority-${incident.priorityLabel.toLowerCase()} status-${incident.status} ${incident.criticalUnclear ? 'critical-unclear-card' : ''}`}
                 onClick={() => onSelectIncident(incident.id)}
               >
                 <div className="priority-side-badge">
@@ -174,12 +211,30 @@ export default function CoordinatorPanel({
                       <span className={`priority-badge ${getPriorityBadgeClass(incident.priorityLabel)}`}>
                         {incident.priorityLabel}
                       </span>
+                      <span className={`source-badge ${sourceBadge.className}`} title={`Reported via ${sourceBadge.label}`}>
+                        {sourceBadge.icon}
+                        <span>{sourceBadge.label}</span>
+                      </span>
                     </div>
                     <span className="card-time">
                       <Calendar size={12} />
                       {formatTime(incident.createdAt)}
                     </span>
                   </div>
+
+                  {incident.criticalUnclear && (
+                    <div className="critical-unclear-banner">
+                      <AlertOctagon size={13} />
+                      <span>Minimal message received — citizen may be unable to respond further. Call back immediately: <strong>{incident.phone}</strong></span>
+                    </div>
+                  )}
+
+                  {incident.status === 'needs_review' && !incident.criticalUnclear && (
+                    <div className="needs-review-banner">
+                      <AlertOctagon size={13} />
+                      <span>Auto-located — please verify position and details before dispatching.</span>
+                    </div>
+                  )}
 
                   <p className="card-desc">{incident.description || <em style={{ opacity: 0.5 }}>No description</em>}</p>
                   {incident.scoreBreakdown && (
@@ -188,6 +243,52 @@ export default function CoordinatorPanel({
                     </p>
                   )}
 
+                  {/* ── Media attachments: photos, videos, voice recording+transcript ── */}
+                  {(hasPhotos || hasVideos || hasVoice) && (
+                    <div className="media-attachments" onClick={(e) => e.stopPropagation()}>
+                      {hasPhotos && (
+                        <div className="media-photo-grid">
+                          {incident.photoUrls.map((url, idx) => (
+                            <a>
+                              key={idx}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="media-photo-thumb"
+                              title="Open full-size photo"
+                            
+                              <img src={url} alt={`Attached photo ${idx + 1}`} loading="lazy" />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+
+                      {hasVideos && incident.videoUrls.map((url, idx) => (
+                        <video key={idx} controls className="media-video-player" preload="metadata">
+                          <source src={url} />
+                          Your browser does not support video playback.
+                        </video>
+                      ))}
+
+                      {hasVoice && (
+                        <div className="media-voice-block">
+                          <div className="media-voice-header">
+                            <Mic size={12} />
+                            <span>Voice report</span>
+                          </div>
+                          <audio controls className="media-audio-player" preload="metadata">
+                            <source src={incident.voiceRecordingUrl} />
+                            Your browser does not support audio playback.
+                          </audio>
+                          {incident.voiceTranscript ? (
+                            <p className="media-transcript">"{incident.voiceTranscript}"</p>
+                          ) : (
+                            <p className="media-transcript pending">Transcript pending…</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Vulnerability tags */}
                   <div className="vulnerability-tags-row">
@@ -212,7 +313,7 @@ export default function CoordinatorPanel({
                       <span>Assigned → <strong>{assignedZoneName}</strong></span>
                     </div>
                   )}
-                  {incident.status === 'pending' && nearest && (
+                  {(incident.status === 'pending' || incident.status === 'needs_review') && nearest && (
                     <div className="route-info-box recommended">
                       <span className="route-dot orange-dot"></span>
                       <Navigation size={11} style={{ display: 'inline', marginRight: 4 }} />
@@ -220,9 +321,52 @@ export default function CoordinatorPanel({
                     </div>
                   )}
 
+                  {/* Manual zone picker — for pending/needs_review OR assigned (reassign) */}
+                  {(incident.status === 'pending' || incident.status === 'needs_review' || incident.status === 'assigned') && (
+                    <div
+                      className="manual-assign-row"
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ display: 'flex', flexDirection: 'column', gap: '4px', margin: '6px 0', width: '100%', boxSizing: 'border-box' }}
+                    >
+                      <select
+                        value={manualZoneChoice[incident.id] || ''}
+                        onChange={(e) =>
+                          setManualZoneChoice((prev) => ({ ...prev, [incident.id]: e.target.value }))
+                        }
+                        style={{
+                          width: '100%',
+                          maxWidth: '100%',
+                          boxSizing: 'border-box',
+                          fontSize: '0.72rem',
+                          padding: '4px',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        <option value="">
+                          {incident.status === 'assigned' ? 'Reassign to…' : 'Assign manually to…'}
+                        </option>
+                        {shelters.map((z) => (
+                          <option key={z.id} value={z.id}>
+                            {z.name.length > 28 ? z.name.slice(0, 28) + '…' : z.name} ({z.capacity.current}/{z.capacity.max})
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        className="btn btn-sm"
+                        onClick={(e) => handleManualAssign(e, incident)}
+                        disabled={!manualZoneChoice[incident.id]}
+                        title="Confirm manual assignment"
+                        style={{ width: '100%', boxSizing: 'border-box', justifyContent: 'center' }}
+                      >
+                        <ChevronDown size={12} />
+                        <span>Confirm Assignment</span>
+                      </button>
+                    </div>
+                  )}
+
                   {/* Actions */}
                   <div className="card-actions" onClick={(e) => e.stopPropagation()}>
-                    {incident.status === 'pending' && (
+                    {(incident.status === 'pending' || incident.status === 'needs_review') && (
                       <button
                         className="btn btn-sm btn-primary"
                         onClick={(e) => handleAutoAssign(e, incident)}

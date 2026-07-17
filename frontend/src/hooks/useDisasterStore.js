@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+
+// 🎬 DEMO MODE: Mask phone numbers for video recording
+function maskPhone(ph) {
+  if (!ph || ph === '—') return ph;
+  if (ph.length <= 6) return ph.replace(/\d/g, 'X');
+  return ph.slice(0, 4) + ph.slice(4, -2).replace(/[\d]/g, 'X') + ph.slice(-2);
+}
 
 // Haversine distance in km between two lat/lng points
 function haversineDistance(lat1, lng1, lat2, lng2) {
@@ -27,7 +34,7 @@ function normaliseTicket(t) {
     id: String(t.id),
     backendId: t.id,
     reporter: t.reporterName || 'Unknown',
-    phone: t.phone || '—',
+    phone: maskPhone(t.phone || '—'),
     category: (t.needType || 'rescue').toLowerCase(),
     description: t.description || '',
     lat: t.latitude,
@@ -38,7 +45,7 @@ function normaliseTicket(t) {
       elderly: t.elderly || false,
       pregnant: t.pregnant || false,
       disabled: t.disabled || false,
-    trapped: t.trapped || false,
+      trapped: t.trapped || false,
     },
     status: (t.status || 'PENDING').toLowerCase(),
     priorityScore: score,
@@ -47,6 +54,13 @@ function normaliseTicket(t) {
     assignedZoneId: t.assignedZoneId ? String(t.assignedZoneId) : null,
     assignedZoneName: t.assignedZoneName || null,
     createdAt: t.createdAt ? new Date(t.createdAt).toISOString() : new Date().toISOString(),
+    // ── Media attachments from SMS/MMS/Voice channels ──────────────────────
+    photoUrls: t.photoUrls || [],
+    videoUrls: t.videoUrls || [],
+    voiceRecordingUrl: t.voiceRecordingUrl || null,
+    voiceTranscript: t.voiceTranscript || null,
+    reportSource: t.reportSource || 'WEB',
+    criticalUnclear: t.criticalUnclear || false,
   };
 }
 
@@ -71,7 +85,7 @@ function normaliseZone(z) {
     color: typeColorMap[z.type] || '#8b5cf6',
     capacity: { max: cap, current: used },
     resources: { food: 100, water: 100, medicine: 100 }, // not tracked in backend yet
-    contacts: z.contacts || '—',
+    contacts: maskPhone(z.contacts || '—'),
   };
 }
 
@@ -390,4 +404,3 @@ export function useDisasterStore() {
     findNearestShelter: findNearestZone,
   };
 }
-

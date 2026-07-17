@@ -2,6 +2,8 @@ package com.resqmap.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tickets")
@@ -50,10 +52,37 @@ public class Ticket {
     private boolean disabled;
     private boolean trapped;
 
+    // ── Media attachments (MMS photo/video, voice call recordings) ──────────
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "ticket_photo_urls", joinColumns = @JoinColumn(name = "ticket_id"))
+    @Column(name = "photo_url", columnDefinition = "TEXT")
+    private List<String> photoUrls = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "ticket_video_urls", joinColumns = @JoinColumn(name = "ticket_id"))
+    @Column(name = "video_url", columnDefinition = "TEXT")
+    private List<String> videoUrls = new ArrayList<>();
+
+    @Column(name = "voice_recording_url", columnDefinition = "TEXT")
+    private String voiceRecordingUrl;
+
+    @Column(name = "voice_transcript", columnDefinition = "TEXT")
+    private String voiceTranscript;
+
+    @Column(name = "report_source")
+    private String reportSource; // WEB, SMS, MMS, VOICE
+
+    // Flag for very short/unclear messages (e.g. a single ".") with no
+    // detectable location — treated as a possible critical distress signal
+    // where the citizen may be unable to provide more information.
+    @Column(name = "critical_unclear")
+    private boolean criticalUnclear;
+
     public Ticket() {
         this.createdAt = Instant.now().toString();
         this.status = "PENDING";
         this.corroborationCount = 1;
+        this.reportSource = "WEB";
     }
 
     public String getId() { return id; }
@@ -112,4 +141,24 @@ public class Ticket {
 
     public boolean isTrapped() { return trapped; }
     public void setTrapped(boolean trapped) { this.trapped = trapped; }
+
+    public List<String> getPhotoUrls() { return photoUrls; }
+    public void setPhotoUrls(List<String> photoUrls) { this.photoUrls = photoUrls; }
+    public void addPhotoUrl(String url) { this.photoUrls.add(url); }
+
+    public List<String> getVideoUrls() { return videoUrls; }
+    public void setVideoUrls(List<String> videoUrls) { this.videoUrls = videoUrls; }
+    public void addVideoUrl(String url) { this.videoUrls.add(url); }
+
+    public String getVoiceRecordingUrl() { return voiceRecordingUrl; }
+    public void setVoiceRecordingUrl(String voiceRecordingUrl) { this.voiceRecordingUrl = voiceRecordingUrl; }
+
+    public String getVoiceTranscript() { return voiceTranscript; }
+    public void setVoiceTranscript(String voiceTranscript) { this.voiceTranscript = voiceTranscript; }
+
+    public String getReportSource() { return reportSource; }
+    public void setReportSource(String reportSource) { this.reportSource = reportSource; }
+
+    public boolean isCriticalUnclear() { return criticalUnclear; }
+    public void setCriticalUnclear(boolean criticalUnclear) { this.criticalUnclear = criticalUnclear; }
 }

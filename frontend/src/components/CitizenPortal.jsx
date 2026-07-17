@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldAlert, AlertTriangle, CheckCircle, Clock, Navigation, MapPin } from 'lucide-react';
+import { ShieldAlert, AlertTriangle, CheckCircle, Clock, Navigation, MapPin, MessageSquare, Phone, Camera } from 'lucide-react';
 
 export default function CitizenPortal({ addIncident, onLocateOnMap, pickCoords, onClearPickCoords }) {
   const [formData, setFormData] = useState({
@@ -27,7 +27,6 @@ export default function CitizenPortal({ addIncident, onLocateOnMap, pickCoords, 
   };
 
   const handleQuickLocate = () => {
-    // Simulate near Kochi, Kerala
     const lat = 9.9312 + (Math.random() - 0.5) * 0.05;
     const lng = 76.2673 + (Math.random() - 0.5) * 0.05;
     onLocateOnMap(lat, lng);
@@ -40,7 +39,6 @@ export default function CitizenPortal({ addIncident, onLocateOnMap, pickCoords, 
       return;
     }
 
-    // Determine latitude/longitude — default to Kochi area if no pin placed
     let lat = pickCoords ? pickCoords.lat : 9.9312 + (Math.random() - 0.5) * 0.05;
     let lng = pickCoords ? pickCoords.lng : 76.2673 + (Math.random() - 0.5) * 0.05;
 
@@ -69,7 +67,6 @@ export default function CitizenPortal({ addIncident, onLocateOnMap, pickCoords, 
     setShowSuccess(true);
     onClearPickCoords();
 
-    // Reset Form
     setFormData({
       reporter: '',
       phone: '',
@@ -94,6 +91,36 @@ export default function CitizenPortal({ addIncident, onLocateOnMap, pickCoords, 
         <div className="portal-badge">Citizen Portal</div>
         <h2>Report Hyper-Local Emergency</h2>
         <p className="subtitle">Submit an immediate distress report. Your report is processed by ResQMap's triage system and routed to nearby shelters.</p>
+      </div>
+
+      {/* ── SMS / Voice / MMS reporting alternative ─────────────────────── */}
+      <div className="alt-report-banner">
+        <div className="alt-report-header">
+          <MessageSquare size={18} />
+          <span>Can't use this form? Report by phone instead</span>
+        </div>
+        <div className="alt-report-body">
+          <div className="alt-report-row">
+            <Phone size={14} />
+            <span>Call or text: <strong>+1 XXX XXX XXXX</strong></span>
+          </div>
+          <div className="alt-report-detail">
+            <MessageSquare size={12} />
+            <span>
+              Just text what's happening and where — e.g.
+              <br />
+              <em>"Flood water rising fast near Kochi, family trapped, need rescue"</em>
+            </span>
+          </div>
+          <div className="alt-report-detail">
+            <Camera size={12} />
+            <span>Can't type? Just send a photo or video — no text needed.</span>
+          </div>
+          <div className="alt-report-detail">
+            <Phone size={12} />
+            <span>Prefer to talk? Call the same number and describe your emergency after the beep.</span>
+          </div>
+        </div>
       </div>
 
       {showSuccess && (

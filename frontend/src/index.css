@@ -1,3 +1,4 @@
+
 /* Reset & Root Variables */
 :root {
   --bg-primary: #080c14;
@@ -126,6 +127,11 @@ body {
   max-width: 40%;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.03);
+  .ticker-scroll {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
 }
 
 .ticker-badge {
@@ -273,8 +279,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
-  overflow-y: auto;
-  flex: 1;
+  overflow-y: visible;
   padding-right: 0.25rem;
 }
 
@@ -322,7 +327,7 @@ body {
 /* Custom Radio Buttons */
 .radio-group {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.35rem;
 }
 
@@ -333,13 +338,15 @@ body {
   justify-content: center;
   border: 1px solid var(--border-color);
   background: rgba(0, 0, 0, 0.2);
-  padding: 0.4rem 0.2rem;
+  padding: 0.5rem 0.4rem;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--text-secondary);
   transition: all 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .radio-label input {
@@ -633,18 +640,22 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .col-center {
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .col-resources {
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* Controls section inside Coordinator command panel */
@@ -775,7 +786,7 @@ body {
   background: rgba(15, 23, 42, 0.45);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1165,6 +1176,7 @@ body {
   flex-direction: column;
   gap: 0.6rem;
   border-radius: 12px;
+   flex-shrink: 0;
 }
 
 .simulator-header {
@@ -1460,4 +1472,408 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+/* ── Needs Review stat card ─────────────────────────────────────────── */
+.stat-card.needs-review {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(180, 83, 9, 0.1));
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  cursor: pointer;
+}
+.stat-card.needs-review .stat-number {
+  color: #eab308;
+}
 
+/* ── Needs Review inline banner ─────────────────────────────────────── */
+.needs-review-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  color: #eab308;
+  font-size: 0.72rem;
+  padding: 5px 8px;
+  border-radius: 6px;
+  margin: 4px 0;
+}
+
+/* ── Report source badge (Web/SMS/MMS/Voice) ────────────────────────── */
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.source-badge.source-web {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+.source-badge.source-sms {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.source-badge.source-mms {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+.source-badge.source-voice {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* ── Media attachments container ─────────────────────────────────────── */
+.media-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+/* Photo grid */
+.media-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 6px;
+}
+.media-photo-thumb {
+  display: block;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.media-photo-thumb:hover {
+  transform: scale(1.04);
+  border-color: rgba(96, 165, 250, 0.5);
+}
+.media-photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Video player */
+.media-video-player {
+  width: 100%;
+  max-height: 220px;
+  border-radius: 8px;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Voice recording + transcript block */
+.media-voice-block {
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.media-voice-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #4ade80;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.media-audio-player {
+  width: 100%;
+  height: 32px;
+}
+.media-transcript {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #cbd5e1;
+  margin: 0;
+  line-height: 1.4;
+}
+.media-transcript.pending {
+  color: #94a3b8;
+  font-style: normal;
+  opacity: 0.7;
+}
+
+/* ── Citizen portal: alternative reporting banner (SMS/Voice/MMS) ──── */
+.alt-report-banner {
+  background: rgba(96, 165, 250, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+.alt-report-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #60a5fa;
+  margin-bottom: 8px;
+}
+.alt-report-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.alt-report-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+.alt-report-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+.alt-report-detail code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #e2e8f0;
+}
+.alt-report-detail em {
+  color: #cbd5e1;
+  font-style: normal;
+  opacity: 0.85;
+}
+/* ── Needs Review stat card ─────────────────────────────────────────── */
+.stat-card.needs-review {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(180, 83, 9, 0.1));
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  cursor: pointer;
+}
+.stat-card.needs-review .stat-number {
+  color: #eab308;
+}
+
+/* ── Needs Review inline banner ─────────────────────────────────────── */
+.needs-review-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  color: #eab308;
+  font-size: 0.72rem;
+  padding: 5px 8px;
+  border-radius: 6px;
+  margin: 4px 0;
+}
+
+/* ── Critical unclear message — highest urgency visual treatment ────── */
+.critical-unclear-card {
+  border: 2px solid #ef4444 !important;
+  animation: critical-pulse 2s ease-in-out infinite;
+}
+@keyframes critical-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+.critical-unclear-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 9px;
+  border-radius: 6px;
+  margin: 4px 0;
+}
+
+/* ── Report source badge (Web/SMS/MMS/Voice) ────────────────────────── */
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.source-badge.source-web {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+.source-badge.source-sms {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.source-badge.source-mms {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+.source-badge.source-voice {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* ── Media attachments container ─────────────────────────────────────── */
+.media-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.media-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 6px;
+}
+.media-photo-thumb {
+  display: block;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.media-photo-thumb:hover {
+  transform: scale(1.04);
+  border-color: rgba(96, 165, 250, 0.5);
+}
+.media-photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.media-video-player {
+  width: 100%;
+  max-height: 220px;
+  border-radius: 8px;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.media-voice-block {
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.media-voice-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #4ade80;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.media-audio-player {
+  width: 100%;
+  height: 32px;
+}
+.media-transcript {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #cbd5e1;
+  margin: 0;
+  line-height: 1.4;
+}
+.media-transcript.pending {
+  color: #94a3b8;
+  font-style: normal;
+  opacity: 0.7;
+}
+
+/* ── Citizen portal: alternative reporting banner (SMS/Voice/MMS) ──── */
+.alt-report-banner {
+  background: rgba(96, 165, 250, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+.alt-report-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #60a5fa;
+  margin-bottom: 8px;
+}
+.alt-report-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.alt-report-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+.alt-report-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+.alt-report-detail code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #e2e8f0;
+}
+.alt-report-detail em {
+  color: #cbd5e1;
+  font-style: normal;
+  opacity: 0.85;
+}
+
+/* Citizen Portal: allow full page scroll instead of internal card scroll */
+.citizen-layout .card {
+  overflow: visible;
+  max-height: none;
+}
+
+.citizen-layout {
+  overflow-y: auto;
+  height: calc(100vh - 90px);
+}
+
+.resource-dashboard {
+  flex-shrink: 0;
+}

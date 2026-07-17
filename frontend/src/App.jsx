@@ -77,17 +77,19 @@ export default function App() {
         </div>
 
         {/* Live ticker */}
-        <div className="header-ticker hide-mobile">
-          <span className="ticker-badge">LIVE</span>
-          <div className="ticker-text animate-marquee">
-            {store.loading
-              ? '⟳ Connecting to Kerala backend…'
-              : store.error
-              ? `⚠ ${store.error}`
-              : `🚨 ${store.tickets.filter(t=>t.status==='pending').length} pending tickets · ⛺ ${store.zones.length} resource zones active across Kerala`
-            }
-          </div>
-        </div>
+      <div className="header-ticker hide-mobile">
+  <span className="ticker-badge">LIVE</span>
+  <div className="ticker-scroll">
+    <div className="ticker-text animate-marquee">
+      {store.loading
+        ? '⟳ Connecting to Kerala backend…'
+        : store.error
+        ? `⚠ ${store.error}`
+        : `🚨 ${store.tickets.filter(t=>t.status==='pending').length} pending tickets · ⛺ ${store.zones.length} resource zones active across Kerala`
+      }
+    </div>
+  </div>
+</div>
 
         <div className="view-toggles">
           <button
@@ -211,10 +213,6 @@ export default function App() {
                   findNearestShelter={store.findNearestZone}
                 />
               </div>
-              <SimulatorControl
-                onSimulateIncident={store.triggerSimulatedIncident}
-                onSimulateResourceDrop={store.triggerSimulatedResourceDrop}
-              />
             </div>
 
             {/* Col 3 – Resource Zones */}
@@ -226,6 +224,10 @@ export default function App() {
                 onSelectShelter={store.setSelectedZoneId}
                 onAdjustCapacity={(id, delta) => store.updateZoneUsage(id, delta)}
                 onRefillResources={store.refillZoneResources}
+              />
+              <SimulatorControl
+                onSimulateIncident={store.triggerSimulatedIncident}
+                onSimulateResourceDrop={store.triggerSimulatedResourceDrop}
               />
             </div>
           </div>

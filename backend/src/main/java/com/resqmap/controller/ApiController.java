@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.*;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "${app.frontend.url:http://localhost:3000}")
 @RestController
 @RequestMapping("/api")
 public class ApiController {
@@ -62,7 +62,7 @@ public class ApiController {
                     t.getLongitude() != null && ticket.getLongitude() != null) {
                 double latDiff = Math.abs(t.getLatitude() - ticket.getLatitude());
                 double lngDiff = Math.abs(t.getLongitude() - ticket.getLongitude());
-                if (latDiff < 0.0009 && lngDiff < 0.0009) { // ~100m radius
+                if (latDiff < 0.0025 && lngDiff < 0.0025) { // ~250m radius (widened for demo reliability)
                     duplicate = t;
                     break;
                 }

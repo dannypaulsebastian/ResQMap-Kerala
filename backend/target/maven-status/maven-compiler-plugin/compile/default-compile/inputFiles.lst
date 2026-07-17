@@ -1,8 +1,0 @@
-/Users/anaswaradinesh/.gemini/antigravity/scratch/disaster-response-portal/backend/src/main/java/com/resqmap/ResQMapApplication.java
-/Users/anaswaradinesh/.gemini/antigravity/scratch/disaster-response-portal/backend/src/main/java/com/resqmap/config/CorsConfig.java
-/Users/anaswaradinesh/.gemini/antigravity/scratch/disaster-response-portal/backend/src/main/java/com/resqmap/controller/ApiController.java
-/Users/anaswaradinesh/.gemini/antigravity/scratch/disaster-response-portal/backend/src/main/java/com/resqmap/model/Resource.java
-/Users/anaswaradinesh/.gemini/antigravity/scratch/disaster-response-portal/backend/src/main/java/com/resqmap/model/Ticket.java
-/Users/anaswaradinesh/.gemini/antigravity/scratch/disaster-response-portal/backend/src/main/java/com/resqmap/repository/ResourceRepository.java
-/Users/anaswaradinesh/.gemini/antigravity/scratch/disaster-response-portal/backend/src/main/java/com/resqmap/repository/TicketRepository.java
-/Users/anaswaradinesh/.gemini/antigravity/scratch/disaster-response-portal/backend/src/main/java/com/resqmap/service/TriageService.java
