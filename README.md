@@ -73,7 +73,7 @@ Backend runs on `http://localhost:8080`, frontend on `http://localhost:3000`.
 
 ## 👥 Team
 
-Built by **Anaswara Dinesh** and **Danny Paul Sebastian**, College of Engineering Cherthala (KTU)
+Built by **Danny Paul Sebastian** and **Anaswara Dinesh**, College of Engineering Cherthala (KTU)
 
 ## 🏆 Recognition
 
